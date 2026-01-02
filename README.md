@@ -37,11 +37,12 @@ A progressive tutorial that demystifies AI coding agents like Kode, Claude Code,
 ## Quick Start
 
 ```bash
-pip install anthropic python-dotenv
+# Install dependencies
+pip install -r requirements.txt
 
 # Configure your API
 cp .env.example .env
-# Edit .env with your API key
+# Edit .env with your Anthropic API key
 
 # Run any version
 python v0_bash_agent.py  # Minimal
@@ -162,6 +163,66 @@ cp v1_basic_agent.py my_agent.py
 > The model is 80%. Code is 20%.
 
 Modern agents like Kode and Claude Code work not because of clever engineering, but because the model is trained to be an agent. Our job is to give it tools and stay out of the way.
+
+## Security Considerations
+
+⚠️ **Educational Code - Not Production Ready**
+
+These implementations prioritize **clarity over security** for learning purposes. Before using in production:
+
+### Known Security Limitations
+
+1. **Command Injection Risk**: All versions use `shell=True` in subprocess calls
+   - **Educational context**: Demonstrates agent capabilities clearly
+   - **Production use**: Implement proper command parsing with `shell=False`
+
+2. **Incomplete Input Validation**: Basic blocklist for dangerous commands
+   - **Current**: Blocks `rm -rf /`, `sudo`, `shutdown`, `reboot`
+   - **Missing**: Many other dangerous patterns (e.g., `:(){ :|:& };:`, file redirection to critical paths)
+   - **Recommendation**: Use sandboxing (Docker, firejail) or restricted shells
+
+3. **Path Traversal Protection**: While `safe_path()` validates paths, it's basic
+   - **Current**: Prevents `../` escaping workspace
+   - **Production**: Add chroot or container isolation
+
+### Production Hardening Checklist
+
+If adapting this code for production:
+
+- [ ] Replace `shell=True` with proper command parsing (`shlex.split()` + `shell=False`)
+- [ ] Implement sandboxing (Docker containers, firejail, or restricted Python environments)
+- [ ] Add comprehensive input validation and sanitization
+- [ ] Enable audit logging for all tool executions
+- [ ] Implement rate limiting and resource quotas
+- [ ] Add authentication and authorization layers
+- [ ] Review and expand dangerous command blocklist
+- [ ] Implement timeout and resource limits at container level
+- [ ] Use principle of least privilege for file system access
+
+### Recommended Sandboxing Approaches
+
+```bash
+# Option 1: Docker (recommended for production)
+docker run --rm -it \
+  -v $(pwd):/workspace:ro \
+  -w /workspace \
+  --network none \
+  --memory="512m" \
+  --cpus="1.0" \
+  python:3.11 python v1_basic_agent.py
+
+# Option 2: Firejail (Linux)
+firejail --noprofile --net=none --private-tmp python v1_basic_agent.py
+
+# Option 3: Python restricted execution (advanced)
+# Use RestrictedPython or similar libraries
+```
+
+### Further Reading
+
+- [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- [Anthropic Model Safety](https://www.anthropic.com/safety)
+- [Python Security Best Practices](https://python.readthedocs.io/en/stable/library/security_warnings.html)
 
 ## License
 
