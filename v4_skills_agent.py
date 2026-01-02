@@ -77,6 +77,7 @@ Usage:
     python v4_skills_agent.py
 """
 
+import json
 import os
 import re
 import subprocess
@@ -103,6 +104,7 @@ BASE_URL = os.getenv("ANTHROPIC_BASE_URL")
 MODEL = os.getenv("MODEL_NAME", "claude-sonnet-4-20250514")
 WORKDIR = Path.cwd()
 SKILLS_DIR = WORKDIR / "skills"
+TODO_FILE = WORKDIR / ".claude" / "todos.json"
 
 client = Anthropic(api_key=API_KEY, base_url=BASE_URL) if BASE_URL else Anthropic(api_key=API_KEY)
 
@@ -302,6 +304,25 @@ class TodoManager:
 
     def __init__(self):
         self.items = []
+        self.load_from_file()
+
+    def load_from_file(self) -> None:
+        """Load todos from .claude/todos.json if it exists."""
+        try:
+            if TODO_FILE.exists():
+                data = json.loads(TODO_FILE.read_text())
+                if isinstance(data, list):
+                    self.items = data
+        except Exception:
+            pass
+
+    def save_to_file(self) -> None:
+        """Save todos to .claude/todos.json for persistence."""
+        try:
+            TODO_FILE.parent.mkdir(parents=True, exist_ok=True)
+            TODO_FILE.write_text(json.dumps(self.items, indent=2))
+        except Exception as e:
+            print(f"Warning: Could not save todos: {e}")
 
     def update(self, items: list) -> str:
         validated = []
@@ -329,6 +350,7 @@ class TodoManager:
             raise ValueError("Only one task can be in_progress")
 
         self.items = validated[:20]
+        self.save_to_file()
         return self.render()
 
     def render(self) -> str:

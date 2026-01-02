@@ -56,6 +56,7 @@ Usage:
     python v2_todo_agent.py
 """
 
+import json
 import os
 import subprocess
 import sys
@@ -79,6 +80,7 @@ API_KEY = os.getenv("ANTHROPIC_API_KEY")
 BASE_URL = os.getenv("ANTHROPIC_BASE_URL")
 MODEL = os.getenv("MODEL_NAME", "claude-sonnet-4-20250514")
 WORKDIR = Path.cwd()
+TODO_FILE = WORKDIR / ".claude" / "todos.json"
 
 client = Anthropic(api_key=API_KEY, base_url=BASE_URL) if BASE_URL else Anthropic(api_key=API_KEY)
 
@@ -107,6 +109,37 @@ class TodoManager:
 
     def __init__(self):
         self.items = []
+        self.load_from_file()
+
+    def load_from_file(self) -> None:
+        """
+        Load todos from persistent storage.
+
+        Loads from .claude/todos.json if it exists. If the file doesn't
+        exist or is invalid, starts with an empty list (graceful degradation).
+        """
+        try:
+            if TODO_FILE.exists():
+                data = json.loads(TODO_FILE.read_text())
+                if isinstance(data, list):
+                    self.items = data
+        except Exception:
+            # Gracefully handle any errors - start fresh if file is corrupted
+            pass
+
+    def save_to_file(self) -> None:
+        """
+        Save todos to persistent storage.
+
+        Saves to .claude/todos.json, creating the directory if needed.
+        This allows todos to persist across agent sessions.
+        """
+        try:
+            TODO_FILE.parent.mkdir(parents=True, exist_ok=True)
+            TODO_FILE.write_text(json.dumps(self.items, indent=2))
+        except Exception as e:
+            # Don't fail the operation if save fails, but log it
+            print(f"Warning: Could not save todos: {e}")
 
     def update(self, items: list) -> str:
         """
@@ -157,6 +190,7 @@ class TodoManager:
             raise ValueError("Only one task can be in_progress at a time")
 
         self.items = validated
+        self.save_to_file()  # Persist after successful update
         return self.render()
 
     def render(self) -> str:
