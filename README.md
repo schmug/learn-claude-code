@@ -51,6 +51,29 @@ python v3_subagent.py    # + Subagents
 python v4_skills_agent.py # + Skills
 ```
 
+## 🌐 Web UI for Multi-Agent Orchestration
+
+**NEW**: Visual interface for managing and monitoring multiple agents in real-time!
+
+```bash
+# Quick start
+./start_web_ui.sh        # Linux/Mac
+# or
+start_web_ui.bat         # Windows
+
+# Then open http://localhost:8000
+```
+
+**Features:**
+- 🎯 Visual agent management with hierarchy tree
+- 📊 Real-time monitoring via WebSocket
+- 💬 Live conversation history
+- 🛠️ Tool execution logs
+- 🌳 Parent-child agent relationships
+- 🎨 Modern, responsive UI
+
+See [web_ui/README.md](./web_ui/README.md) for full documentation.
+
 ## The Core Pattern
 
 Every coding agent is just this loop:
@@ -76,8 +99,14 @@ learn-claude-code/
 ├── v2_todo_agent.py       # ~300 lines: + TodoManager
 ├── v3_subagent.py         # ~450 lines: + Task tool, agent registry
 ├── v4_skills_agent.py     # ~550 lines: + Skill tool, SkillLoader
+├── web_ui/                # Web interface for multi-agent orchestration
+│   ├── server.py          # FastAPI backend with WebSocket support
+│   ├── static/            # Frontend (HTML/CSS/JS)
+│   └── README.md          # Web UI documentation
 ├── skills/                # Example skills (for learning)
-└── docs/                  # Detailed explanations (EN + ZH)
+├── docs/                  # Detailed explanations (EN + ZH)
+├── start_web_ui.sh        # Quick start script (Linux/Mac)
+└── start_web_ui.bat       # Quick start script (Windows)
 ```
 
 ## Using the Agent Builder Skill

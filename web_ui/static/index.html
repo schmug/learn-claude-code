@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Orchestration UI</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Multi-Agent Orchestration</h1>
+            <p class="subtitle">Visual interface for managing AI agents and subagents</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel: Agent Tree -->
+            <div class="left-panel">
+                <div class="panel-header">
+                    <h2>Agent Hierarchy</h2>
+                    <button id="refreshBtn" class="btn btn-sm">🔄 Refresh</button>
+                </div>
+                <div id="agentTree" class="agent-tree"></div>
+
+                <div class="panel-header" style="margin-top: 20px;">
+                    <h2>Create New Agent</h2>
+                </div>
+                <form id="createAgentForm" class="create-form">
+                    <div class="form-group">
+                        <label for="agentName">Agent Name:</label>
+                        <input type="text" id="agentName" required placeholder="e.g., Explorer Agent">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentType">Agent Type:</label>
+                        <select id="agentType" required>
+                            <option value="explore">Explore (Read-only)</option>
+                            <option value="code">Code (Full Access)</option>
+                            <option value="plan">Plan (Design Only)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentTask">Task:</label>
+                        <textarea id="agentTask" required rows="3" placeholder="Describe the task for this agent..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parentAgent">Parent Agent (Optional):</label>
+                        <select id="parentAgent">
+                            <option value="">None (Root Agent)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create & Start Agent</button>
+                </form>
+            </div>
+
+            <!-- Right Panel: Agent Details -->
+            <div class="right-panel">
+                <div class="panel-header">
+                    <h2>Agent Details</h2>
+                    <div id="agentControls" class="agent-controls" style="display: none;">
+                        <button id="startAgentBtn" class="btn btn-success btn-sm">▶️ Start</button>
+                        <button id="stopAgentBtn" class="btn btn-warning btn-sm">⏸️ Stop</button>
+                        <button id="deleteAgentBtn" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                    </div>
+                </div>
+
+                <div id="agentDetails" class="agent-details">
+                    <div class="empty-state">
+                        <p>Select an agent from the tree to view details</p>
+                    </div>
+                </div>
+
+                <div class="panel-header" style="margin-top: 20px;">
+                    <h2>Conversation History</h2>
+                </div>
+                <div id="conversationHistory" class="conversation-history"></div>
+
+                <div class="panel-header" style="margin-top: 20px;">
+                    <h2>Tool Execution Log</h2>
+                </div>
+                <div id="toolLog" class="tool-log"></div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span id="connectionStatus" class="status-indicator">🔴 Disconnected</span>
+            <span id="agentCount">0 agents</span>
+            <span id="activeAgentCount">0 active</span>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
